@@ -4,13 +4,12 @@ import { revalidatePath } from "next/cache";
 import User from "../models/user.model";
 import { connectToDb } from "../mongoose";
 
-interface UserActionProps {
+interface UserActionParams {
   userId: string;
   username: string;
   name: string;
   bio: string;
   image: string;
-  onboarded: boolean;
   path: string;
 }
 
@@ -20,11 +19,11 @@ export async function updateUser({
   name,
   bio,
   image,
-  onboarded,
   path,
-}: UserActionProps) {
+}: UserActionParams) {
   connectToDb();
 
+  console.log("first");
   try {
     await User.findOneAndUpdate(
       //find
@@ -36,7 +35,7 @@ export async function updateUser({
         name,
         bio,
         image,
-        onboarded: true,
+        onBoarded: true,
       },
       { upsert: true },
     );

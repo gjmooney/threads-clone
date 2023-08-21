@@ -1,24 +1,25 @@
 "use client";
 
+import { updateUser } from "@/lib/actions/user.actions";
+import { useUploadThing } from "@/lib/uploadthing";
+import { isBase64Image } from "@/lib/utils";
 import { UserSchemaType, UserValidator } from "@/lib/validators/user";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, FC, useState } from "react";
 import { useForm } from "react-hook-form";
+import { Button } from "../ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import Image from "next/image";
 import { Textarea } from "../ui/textarea";
-import { useUploadThing } from "@/lib/uploadthing";
-import { isBase64Image } from "@/lib/utils";
 
 interface AccountProfileProps {
   user: {
@@ -35,6 +36,8 @@ interface AccountProfileProps {
 const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
   const [files, setFiles] = useState<File[]>([]);
   const { startUpload } = useUploadThing("media");
+  const router = useRouter();
+  const pathname = usePathname();
 
   const form = useForm({
     resolver: zodResolver(UserValidator),
@@ -46,9 +49,9 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
     },
   });
 
-  async function onSubmit(values: UserSchemaType) {
+  const onSubmit = async (values: UserSchemaType) => {
+    console.log("submit");
     const blob = values.profile_photo;
-
     const hasImageChanged = isBase64Image(blob);
 
     if (hasImageChanged) {
@@ -60,7 +63,23 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
     }
 
     //TODO update user profile
-  }
+    await updateUser({
+      username: values.username,
+      name: values.name,
+      bio: values.bio,
+      image: values.profile_photo,
+      userId: user.id,
+      path: pathname,
+    });
+
+    // Go back to profile if editing
+    // Go to home if onboarding
+    if (pathname === "/profile/edit") {
+      router.push("/profile");
+    } else {
+      router.push("/");
+    }
+  };
 
   function handleImageUpload(
     e: ChangeEvent<HTMLInputElement>,
@@ -129,6 +148,7 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
                     onChange={(e) => handleImageUpload(e, field.onChange)}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -148,6 +168,7 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -167,6 +188,7 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -186,12 +208,13 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
 
           <Button type="submit" className="bg-primary-500">
-            Submit
+            {buttonTitle}
           </Button>
         </form>
       </Form>
