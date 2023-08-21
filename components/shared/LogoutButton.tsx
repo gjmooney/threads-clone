@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { FC } from "react";
 
 interface LogoutButtonProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const LogoutButton: FC<LogoutButtonProps> = ({ children }) => {
@@ -16,7 +16,7 @@ const LogoutButton: FC<LogoutButtonProps> = ({ children }) => {
     <div>
       <SignedIn>
         <SignOutButton signOutCallback={() => router.push("/sign-in")}>
-          <div className="flex gap-4 p-4 cursor-pointer">
+          <div className="flex cursor-pointer gap-4 p-4">
             <Image
               src="/assets/logout.svg"
               alt="logout"
