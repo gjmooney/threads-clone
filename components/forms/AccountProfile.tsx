@@ -19,7 +19,7 @@ import Image from "next/image";
 import { Textarea } from "../ui/textarea";
 
 interface AccountProfileProps {
-  user?: {
+  user: {
     id: string;
     objectId: string;
     username: string;
@@ -31,6 +31,7 @@ interface AccountProfileProps {
 }
 
 const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
+  console.log("user", user);
   const form = useForm({
     resolver: zodResolver(UserValidator),
     defaultValues: {
