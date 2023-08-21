@@ -34,10 +34,10 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
   const form = useForm({
     resolver: zodResolver(UserValidator),
     defaultValues: {
-      name: "",
-      username: "",
-      bio: "",
-      profile_photo: "",
+      profile_photo: user?.image || "",
+      name: user?.name || "",
+      username: user?.username || "",
+      bio: user?.bio || "",
     },
   });
 
@@ -101,11 +101,11 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem className="flex w-full items-center gap-3">
+              <FormItem className="flex w-full flex-col gap-3">
                 <FormLabel className="text-base-semibold text-light-2">
                   Name
                 </FormLabel>
-                <FormControl className="text-base-semibold flex-1 text-gray-200">
+                <FormControl>
                   <Input
                     type="text"
                     className="account-form_input no-focus"
@@ -120,11 +120,11 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
             control={form.control}
             name="username"
             render={({ field }) => (
-              <FormItem className="flex w-full items-center gap-3">
+              <FormItem className="flex w-full flex-col gap-3">
                 <FormLabel className="text-base-semibold text-light-2">
                   Username
                 </FormLabel>
-                <FormControl className="text-base-semibold flex-1 text-gray-200">
+                <FormControl>
                   <Input
                     type="text"
                     className="account-form_input no-focus"
@@ -139,11 +139,11 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
             control={form.control}
             name="bio"
             render={({ field }) => (
-              <FormItem className="flex w-full items-center gap-3">
+              <FormItem className="flex w-full flex-col gap-3">
                 <FormLabel className="text-base-semibold text-light-2">
                   Bio
                 </FormLabel>
-                <FormControl className="text-base-semibold flex-1 text-gray-200">
+                <FormControl>
                   <Textarea
                     rows={10}
                     className="account-form_input no-focus"
@@ -154,7 +154,9 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
             )}
           />
 
-          <Button type="submit">Submit</Button>
+          <Button type="submit" className="bg-primary-500">
+            Submit
+          </Button>
         </form>
       </Form>
     </div>
