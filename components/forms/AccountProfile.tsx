@@ -2,7 +2,7 @@
 
 import { UserSchemaType, UserValidator } from "@/lib/validators/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangeEvent, FC } from "react";
+import { ChangeEvent, FC, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -31,7 +31,8 @@ interface AccountProfileProps {
 }
 
 const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
-  console.log("user", user);
+  const [files, setFiles] = useState<File[]>([]);
+
   const form = useForm({
     resolver: zodResolver(UserValidator),
     defaultValues: {
@@ -48,8 +49,29 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
     console.log(values);
   }
 
-  function handleImage(e: ChangeEvent, fieldChange: (value: string) => void) {
+  function handleImageUpload(
+    e: ChangeEvent<HTMLInputElement>,
+    fieldChange: (value: string) => void,
+  ) {
     e.preventDefault;
+    const fileReader = new FileReader();
+
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+
+      setFiles(Array.from(e.target.files));
+
+      if (!file.type.includes("image")) {
+        return;
+      }
+
+      fileReader.onload = async (event) => {
+        const imageDataUrl = event.target?.result?.toString() || "";
+        fieldChange(imageDataUrl);
+      };
+
+      fileReader.readAsDataURL(file);
+    }
   }
 
   return (
@@ -91,7 +113,7 @@ const AccountProfile: FC<AccountProfileProps> = ({ user, buttonTitle }) => {
                     accept="image/*"
                     placeholder="Upload a photo..."
                     className="account-form_image-input"
-                    onChange={(e) => handleImage(e, field.onChange)}
+                    onChange={(e) => handleImageUpload(e, field.onChange)}
                   />
                 </FormControl>
               </FormItem>
