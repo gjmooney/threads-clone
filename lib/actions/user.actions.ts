@@ -13,6 +13,17 @@ interface UserActionParams {
   path: string;
 }
 
+type UserDocument = {
+  id: string;
+  username: string;
+  name: string;
+  image: string;
+  bio: string;
+  filaments: string[];
+  onBoarded: boolean;
+  communities: string[];
+};
+
 export async function updateUser({
   userId,
   username,
@@ -45,5 +56,15 @@ export async function updateUser({
     }
   } catch (error: any) {
     throw new Error(`Failed to create/update user: ${error.message}`);
+  }
+}
+
+export async function fetchUser(userId: string) {
+  try {
+    connectToDb();
+
+    return await User.findOne({ id: userId });
+  } catch (error: any) {
+    throw new Error(`Failed to fetch user: ${error.message}`);
   }
 }
