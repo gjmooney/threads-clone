@@ -49,9 +49,26 @@ const page: FC<pageProps> = async ({ params }) => {
       <div className="mt-7">
         <Comment
           threadId={filament.id}
-          currentUserImg={user.imageUrl}
+          currentUserImg={userInfo.image}
           currentUserId={JSON.stringify(userInfo._id)}
         />
+      </div>
+
+      <div className="mt-10">
+        {filament.children.map((childItem: any) => (
+          <FilamentCard
+            key={childItem._id}
+            currentUserId={childItem.id}
+            id={childItem._id}
+            parentId={childItem.parentId}
+            content={childItem.text}
+            author={childItem.author}
+            community={childItem.community}
+            createdAt={childItem.createdAt}
+            comments={childItem.children}
+            isComment
+          />
+        ))}
       </div>
     </section>
   );
