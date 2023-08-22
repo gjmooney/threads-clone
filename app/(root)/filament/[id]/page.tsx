@@ -1,9 +1,11 @@
 import FilamentCard from "@/components/cards/FilamentCard";
+import Comment from "@/components/forms/Comment";
 import { fetchFilamentById } from "@/lib/actions/filaments.actions";
 import { fetchUser } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { FC } from "react";
+import { threadId } from "worker_threads";
 
 interface pageProps {
   params: {
@@ -41,6 +43,14 @@ const page: FC<pageProps> = async ({ params }) => {
           community={filament.community}
           createdAt={filament.createdAt}
           comments={filament.children}
+        />
+      </div>
+
+      <div className="mt-7">
+        <Comment
+          threadId={filament.id}
+          currentUserImg={user.imageUrl}
+          currentUserId={JSON.stringify(userInfo._id)}
         />
       </div>
     </section>

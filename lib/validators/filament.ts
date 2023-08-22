@@ -8,7 +8,6 @@ export const FilamentValidator = z.object({
 // because comments are also filaments
 export const CommentValidator = z.object({
   filament: z.string().min(3),
-  accountId: z.string(),
 });
 
 export type FilamentSchemaType = z.infer<typeof FilamentValidator>;

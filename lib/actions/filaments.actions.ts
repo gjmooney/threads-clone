@@ -114,3 +114,42 @@ export async function fetchFilamentById(id: string) {
     throw new Error(`Error fetching thread: ${error.message}`);
   }
 }
+
+export async function addCommentToThread(
+  filamentId: string,
+  commentText: string,
+  userId: string,
+  path: string,
+) {
+  connectToDb();
+
+  try {
+    // Find the original filament by its ID
+    const originalFilament = await Filament.findById(filamentId);
+
+    if (!originalFilament) {
+      throw new Error("Filament not found");
+    }
+
+    // Create the new comment Filament
+    const commentFilament = new Filament({
+      text: commentText,
+      author: userId,
+      parentId: filamentId, // Set the parentId to the original Filament's ID
+    });
+
+    // Save the comment Filament to the database
+    const savedCommentFilament = await commentFilament.save();
+
+    // Add the comment Filament's ID to the original Filament's children array
+    originalFilament.children.push(savedCommentFilament._id);
+
+    // Save the updated original Filament to the database
+    await originalFilament.save();
+
+    revalidatePath(path);
+  } catch (error) {
+    console.error("Error while adding comment:", error);
+    throw new Error("Unable to add comment");
+  }
+}
