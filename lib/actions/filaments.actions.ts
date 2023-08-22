@@ -77,3 +77,40 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
     throw new Error(`Error fetching posts: ${error.message}`);
   }
 }
+
+export async function fetchFilamentById(id: string) {
+  connectToDb();
+
+  try {
+    const filament = await Filament.findById(id)
+      .populate({
+        path: "author",
+        model: User,
+        select: "_id id name image",
+      })
+      .populate({
+        path: "children", // Populate the children field
+        populate: [
+          {
+            path: "author", // Populate the author field within children
+            model: User,
+            select: "_id id name parentId image", // Select only _id and username fields of the author
+          },
+          {
+            path: "children", // Populate the children field within children
+            model: Filament, // The model of the nested children (assuming it's the same "Filament" model)
+            populate: {
+              path: "author", // Populate the author field within nested children
+              model: User,
+              select: "_id id name parentId image", // Select only _id and username fields of the author
+            },
+          },
+        ],
+      })
+      .exec();
+
+    return filament;
+  } catch (error: any) {
+    throw new Error(`Error fetching thread: ${error.message}`);
+  }
+}
