@@ -20,7 +20,11 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { FilamentValidator } from "@/lib/validators/filament";
+import {
+  FilamentSchemaType,
+  FilamentValidator,
+} from "@/lib/validators/filament";
+import { createFilament } from "@/lib/actions/filaments.actions";
 
 interface PostFilamentProps {
   userId: string;
@@ -38,7 +42,16 @@ const PostFilament: FC<PostFilamentProps> = ({ userId }) => {
     },
   });
 
-  const onSubmit = () => {};
+  const onSubmit = async (values: FilamentSchemaType) => {
+    await createFilament({
+      text: values.filament,
+      author: userId,
+      communityId: null,
+      path: pathname,
+    });
+
+    router.push("/");
+  };
 
   return (
     <div>
