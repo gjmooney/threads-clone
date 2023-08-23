@@ -154,3 +154,32 @@ export async function fetchAllUsers({
     throw new Error(`Failed to fetch user: ${error.message}`);
   }
 }
+
+export async function getActivity(userId: string) {
+  try {
+    connectToDb();
+
+    // Find all threads created by the user
+    const userFilaments = await Filament.find({ author: userId });
+
+    // Collect all the child thread ids (replies) from the 'children' field of each user thread
+    const childFilamentIds = userFilaments.reduce((acc, userFilament) => {
+      return acc.concat(userFilament.children);
+    }, []);
+
+    // Find and return the child Filaments (replies) excluding the ones created by the same user
+    const replies = await Filament.find({
+      _id: { $in: childFilamentIds },
+      author: { $ne: userId }, // Exclude threads authored by the same user
+    }).populate({
+      path: "author",
+      model: User,
+      select: "name image _id",
+    });
+
+    return replies;
+  } catch (error) {
+    console.error("Error fetching replies: ", error);
+    throw error;
+  }
+}
