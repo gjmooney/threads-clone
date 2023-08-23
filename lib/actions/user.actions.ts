@@ -1,11 +1,12 @@
 "use server";
 
+import { FilterQuery, SortOrder } from "mongoose";
 import { revalidatePath } from "next/cache";
+import Filament from "../models/filament.model";
 import User from "../models/user.model";
 import { connectToDb } from "../mongoose";
-import Filament from "../models/filament.model";
 
-interface UserActionParams {
+interface UpdateUserParams {
   userId: string;
   username: string;
   name: string;
@@ -25,6 +26,14 @@ type UserDocument = {
   communities: string[];
 };
 
+interface FetchAllUsersParams {
+  userId: string;
+  searchString?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  sortBy?: SortOrder;
+}
+
 export async function updateUser({
   userId,
   username,
@@ -32,7 +41,7 @@ export async function updateUser({
   bio,
   image,
   path,
-}: UserActionParams) {
+}: UpdateUserParams) {
   connectToDb();
 
   console.log("first");
@@ -99,5 +108,49 @@ export async function fetchUserPosts(userId: string) {
   } catch (error) {
     console.error("Error fetching user threads:", error);
     throw error;
+  }
+}
+
+export async function fetchAllUsers({
+  userId,
+  searchString = "",
+  pageNumber = 1,
+  pageSize = 20,
+  sortBy = "desc",
+}: FetchAllUsersParams) {
+  try {
+    connectToDb();
+
+    const skipAmount = (pageNumber - 1) * pageSize;
+
+    const regex = new RegExp(searchString, "i");
+
+    const query: FilterQuery<typeof User> = {
+      id: { $ne: userId },
+    };
+
+    if (searchString.trim() !== "") {
+      query.$or = [
+        { username: { $regex: regex } },
+        { name: { $regex: regex } },
+      ];
+    }
+
+    const sortOptions = { createdAt: sortBy };
+
+    const usersQuery = User.find(query)
+      .sort(sortOptions)
+      .skip(skipAmount)
+      .limit(pageSize);
+
+    const totalUsersCount = await User.countDocuments(query);
+
+    const users = await usersQuery.exec();
+
+    const isNext = totalUsersCount > skipAmount + users.length;
+
+    return { users, isNext };
+  } catch (error: any) {
+    throw new Error(`Failed to fetch user: ${error.message}`);
   }
 }

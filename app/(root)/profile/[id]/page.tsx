@@ -5,7 +5,6 @@ import { profileTabs } from "@/constants";
 import { fetchUser } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs";
 import Image from "next/image";
-import { redirect } from "next/navigation";
 import { FC } from "react";
 
 interface pageProps {

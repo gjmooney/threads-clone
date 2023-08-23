@@ -6,11 +6,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FC } from "react";
 import LogoutButton from "./LogoutButton";
+import { useAuth } from "@clerk/nextjs";
 
 interface LeftSideBarProps {}
 
 const LeftSideBar: FC<LeftSideBarProps> = ({}) => {
   const pathName = usePathname();
+  const { userId } = useAuth();
 
   return (
     <section className="custom-scrollbar leftsidebar">
@@ -19,6 +21,10 @@ const LeftSideBar: FC<LeftSideBarProps> = ({}) => {
           const isActive =
             (pathName.includes(link.route) && link.route.length > 1) ||
             pathName === link.route;
+
+          if (link.route === "/profile") {
+            link.route = `${link.route}/${userId}`;
+          }
 
           return (
             <Link
